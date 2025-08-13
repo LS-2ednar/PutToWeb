@@ -1,4 +1,4 @@
-
+from textnode import TextNode, TextType
 
 class HTMLNode:
     def __init__(self, TAG=None, VALUE=None, CHILDREN=None, PROPS=None):
@@ -42,9 +42,13 @@ class HTMLNode:
 
 class LeafNode(HTMLNode):
     def __init__(self, TAG=None, VALUE=None, PROPS=None):
-        self.tag = TAG
-        self.value = VALUE
-        self.props = PROPS
+        if VALUE is None:
+            raise ValueError("LeafNode must have a VALUE")
+
+        if not isinstance(VALUE, str):
+            raise TypeError(f"VALUE of type {type(VALUE)}! Required Type: str")
+
+        super().__init__(TAG=TAG, VALUE=VALUE,CHILDREN=None,PROPS=PROPS)
 
     def to_html(self):
         if self.props != None:
@@ -54,3 +58,45 @@ class LeafNode(HTMLNode):
         else:
             return f'<{self.tag}>{self.value}</{self.tag}>'
 
+class ParentNode(HTMLNode):
+    def __init__(self, TAG=None, CHILDREN=None, PROPS=None):
+        if TAG is None:
+            raise ValueError("TAG is required")
+        if CHILDREN is None:
+            raise ValueError("CHILDREN are required")
+
+        super().__init__(TAG=TAG, VALUE=None,CHILDREN=CHILDREN,PROPS=PROPS)
+
+    def to_html(self):
+        if self.tag == None:
+            raise ValueError("TAG is required")
+        if self.children == None:
+            raise ValueError("CHILDREN are required")
+
+        inner ="".join(child.to_html() for child in self.children)
+
+        return f'<{self.tag}>{inner}</{self.tag}>'
+
+def text_node_to_html_node(text_node):
+    if not isinstance(text_node,TextNode):
+        raise ValueError("No TextNode Type provided!")
+    
+    match text_node.text_type:
+        case TextType.TEXT | "text":
+            return LeafNode(None, text_node.text)
+        case TextType.BOLD | "bold":
+            return LeafNode("b", text_node.text)
+        case TextType.ITALIC | "italic":
+            return LeafNode("i", text_node.text)
+        case TextType.CODE | "code":
+            return LeafNode("code", text_node.text)
+        case TextType.LINK | "link":
+            if not text_node.url:
+                raise ValueError("LINK nodes require a url")
+            return LeafNode("a", text_node.text, {"href": text_node.url})
+        case TextType.IMAGE | "image":
+            if not text_node.url:
+                raise ValueError("IMAGE nodes require a url")
+            return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
+
+    raise Exception("Undefined Tag used")

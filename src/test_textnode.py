@@ -9,7 +9,7 @@ class TestTextNode(unittest.TestCase):
         return self.assertEqual(node, node2)
 
     def test_uneq_different_TextType(self):
-        node = TextNode("This is a text node", TextType.PLAIN)
+        node = TextNode("This is a text node", TextType.TEXT)
         node2 = TextNode("This is a text node", TextType.BOLD)
         return self.assertNotEqual(node, node2)
 
