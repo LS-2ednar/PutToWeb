@@ -76,3 +76,69 @@ This is the same paragraph on a new line
                 "- This is a list\n- with items",
             ],
         )
+    def test_headings_level1(self):
+        text = "# Here is a Heading 1"
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.heading, block_type)
+
+    def test_headings_level2(self):
+        text = "## Here is a Heading 2"
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.heading, block_type)
+
+    def test_headings_level3(self):
+        text = "### Here is a Heading 3"
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.heading, block_type)
+
+    def test_headings_level4(self):
+        text = "#### Here is a Heading 4"
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.heading, block_type)
+
+    def test_headings_level5(self):
+        text = "##### Here is a Heading 5"
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.heading, block_type)
+
+    def test_headings_level6(self):
+        text = "###### Here is a Heading 6"
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.heading, block_type)
+
+    def test_paragraph(self):
+        text = "Here is a Heading 6"
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.paragraph, block_type)
+
+    def test_code(self):
+        text = "```Here is a Heading 6```"
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.code, block_type)
+    
+    def test_quote(self):
+        text = "> Here is a Heading"
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.quote, block_type)
+
+    def test_unordered_list_simple(self):
+        text = "- Here is a Heading"
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.unordered_list, block_type)
+
+    def test_unordered_list_multi(self):
+        text = """- Here is a Heading
+- One More Heading"""
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.unordered_list, block_type)
+    
+    def test_ordered_list_simple(self):
+        text = "1. Here is a Heading"
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.ordered_list, block_type)
+
+    def test_ordered_list_multi(self):
+        text = """1. Here is a Heading
+2. One More Heading"""
+        block_type = block_to_block_type(text)
+        self.assertEqual(BlockType.ordered_list, block_type)

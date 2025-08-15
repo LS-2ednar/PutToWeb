@@ -1,6 +1,15 @@
 import re
 from htmlnode import *
 from textnode import *
+from enum import Enum
+
+class BlockType(Enum):
+    paragraph = "paragrah"
+    heading = "heading"
+    code = "code"
+    quote = "quote"
+    unordered_list = "unordered_list"
+    ordered_list = "ordered_list"
 
 def text_node_to_html_node(text_node):
     if not isinstance(text_node,TextNode):
@@ -108,7 +117,47 @@ def markdown_to_blocks(markdown):
     raw_blocks = markdown.split("\n\n")
     blocks = []
     for block in raw_blocks:
-        if len(block) == "":
+        if len(block) == 0:
             continue
         blocks.append(block.strip())
     return blocks
+
+def block_to_block_type(block):
+    if len(block) == 0:
+        return
+    if block[0:3] == "```" and block[-3::] == "```":
+        return BlockType.code
+    elif block[0] == ">":
+        return BlockType.quote
+    elif block[0] == "-":
+        return BlockType.unordered_list
+    elif block[1] == "." and block[0].isdigit():
+        return BlockType.ordered_list
+    elif "#" in block[0:7]:
+        return BlockType.heading
+    else:
+        return BlockType.paragraph
+    
+def markdown_to_html_node(markdown):
+    blocks = markdown_to_blocks(markdown)
+    new_html = ""
+    for block in blocks:
+        block_type = block_to_block_type(block)
+
+        """
+        Will mostliekly need to rework some of the markdown_to_blocks function specially the part about ordered and unordered lists!
+        """
+
+
+        if block_type == BlockType.paragrah:
+            pass
+        elif block_type == BlockType.heading:
+            pass
+        elif block_type == BlockType.code:
+            pass
+        elif block_type == BlockType.quote:
+            pass
+        elif block_type == BlockType.unordered_list:
+            pass
+        elif block_type == BlockType.ordered_list:
+            pass
