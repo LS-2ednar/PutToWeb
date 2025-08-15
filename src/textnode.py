@@ -14,6 +14,14 @@ class TextNode:
         if not isinstance(TEXT, str):
             raise TypeError(f"Provided Text is not type string! Type: {type(TEXT)}")
 
+        if isinstance(TEXT_TYPE,TextType):
+            tt = TEXT_TYPE
+        elif isinstance(TEXT_TYPE,"str"):
+            try:
+                tt = TextType(TEXT_TYPE.lower())
+            except:
+                raise ValueError(f"TEXT_TYPE for {TEXT_TYPE} does not exist")
+
         if not any(x.value == TEXT_TYPE.value for x in TextType):
             raise Exception(f"TextType {TEXT_TYPE} does not exist!")
 
@@ -22,7 +30,7 @@ class TextNode:
                 raise TypeError(f"Provided URL is not type string! Type: {type(URL)}")
 
         self.text = TEXT
-        self.text_type = TEXT_TYPE.value    
+        self.text_type = tt  
         self.url = URL
 
     def __eq__(self, other):

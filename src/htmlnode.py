@@ -77,26 +77,3 @@ class ParentNode(HTMLNode):
 
         return f'<{self.tag}>{inner}</{self.tag}>'
 
-def text_node_to_html_node(text_node):
-    if not isinstance(text_node,TextNode):
-        raise ValueError("No TextNode Type provided!")
-    
-    match text_node.text_type:
-        case TextType.TEXT | "text":
-            return LeafNode(None, text_node.text)
-        case TextType.BOLD | "bold":
-            return LeafNode("b", text_node.text)
-        case TextType.ITALIC | "italic":
-            return LeafNode("i", text_node.text)
-        case TextType.CODE | "code":
-            return LeafNode("code", text_node.text)
-        case TextType.LINK | "link":
-            if not text_node.url:
-                raise ValueError("LINK nodes require a url")
-            return LeafNode("a", text_node.text, {"href": text_node.url})
-        case TextType.IMAGE | "image":
-            if not text_node.url:
-                raise ValueError("IMAGE nodes require a url")
-            return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
-
-    raise Exception("Undefined Tag used")
