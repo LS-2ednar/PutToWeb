@@ -41,9 +41,9 @@ def text_to_textnodes(text):
     code_bold = split_nodes_delimiter(code,"**",TextType.BOLD)
     code_bold_itlaic= split_nodes_delimiter(code_bold,"_",TextType.ITALIC)
     images = split_nodes_image(code_bold_itlaic)    
-    images_links = split_nodes_link(images)
+    textnodes = split_nodes_link(images)
 
-    return images_links
+    return textnodes
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     """
@@ -137,27 +137,48 @@ def block_to_block_type(block):
         return BlockType.heading
     else:
         return BlockType.paragraph
+
+def textnode_to_html(textnode):
+    if textnode.text_type == TextType.TEXT:
+        return f"<p>{textnode.text}</p>"
+    elif textnode.text_type == TextType.BOLD:
+        return f"<b>{textnode.text}</b>"
+    elif textnode.text_type == TextType.ITALIC:
+        return f"<i>{textnode.text}</i>"
+    elif textnode.text_type == TextType.CODE:
+        return f"<code>{textnode.text}</code>"
+    elif textnode.text_type == TextType.LINK:
+        return f'<a href="{textnode.url}">{textnode.text}</a>'
+    elif textnode.text_type == TextType.IMAGE:
+        return f'<img src="{textnode.url}" alt="{textnode.text}">'
+
+
+def create_html_from_block(block,block_type):
+
+    if block_type == BlockType.paragraph:
+        return f"<div>{1}</div>"
+    elif block_type == BlockType.heading:
+        return f"<div>{2}</div>"
+    elif block_type == BlockType.code:
+        return f"<div>{3}</div>"
+    elif block_type == BlockType.quote:
+        return f"<div>{4}</div>"
+    elif block_type == BlockType.unordered_list:
+        return f"<div>{5}</div>"
+    elif block_type == BlockType.ordered_list:
+        return f"<div>{6}</div>"
+    else:
+        raise TypeError(f"No BlockType: {block_type} define ")
     
+
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
     new_html = ""
     for block in blocks:
         block_type = block_to_block_type(block)
-
+        
         """
         Will mostliekly need to rework some of the markdown_to_blocks function specially the part about ordered and unordered lists!
         """
-
-
-        if block_type == BlockType.paragrah:
-            pass
-        elif block_type == BlockType.heading:
-            pass
-        elif block_type == BlockType.code:
-            pass
-        elif block_type == BlockType.quote:
-            pass
-        elif block_type == BlockType.unordered_list:
-            pass
-        elif block_type == BlockType.ordered_list:
-            pass
+        
+    return 
