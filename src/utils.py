@@ -138,47 +138,50 @@ def block_to_block_type(block):
     else:
         return BlockType.paragraph
 
-def textnode_to_html(textnode):
-    if textnode.text_type == TextType.TEXT:
-        return f"<p>{textnode.text}</p>"
-    elif textnode.text_type == TextType.BOLD:
-        return f"<b>{textnode.text}</b>"
-    elif textnode.text_type == TextType.ITALIC:
-        return f"<i>{textnode.text}</i>"
-    elif textnode.text_type == TextType.CODE:
-        return f"<code>{textnode.text}</code>"
-    elif textnode.text_type == TextType.LINK:
-        return f'<a href="{textnode.url}">{textnode.text}</a>'
-    elif textnode.text_type == TextType.IMAGE:
-        return f'<img src="{textnode.url}" alt="{textnode.text}">'
+def split_list(text):
+    if len(text.split("-")) > 1:
+        return text.split("-")
+    else:
+        return text.split("\n")
 
 
-def create_html_from_block(block,block_type):
-
+def create_htmlnode_from_block(block,block_type):
+    children = []
     if block_type == BlockType.paragraph:
-        return f"<div>{1}</div>"
+        textelements = text_to_textnodes(block)
+        for textelement in textelements:
+            children.append(text_node_to_html_node(textelement))
+
     elif block_type == BlockType.heading:
-        return f"<div>{2}</div>"
+        children.append(HTMLNode(f'h{block.count("#")}',block))
+
     elif block_type == BlockType.code:
-        return f"<div>{3}</div>"
+        children.append(HTMLNode("code",block))
+        
     elif block_type == BlockType.quote:
-        return f"<div>{4}</div>"
+        children.append(LeafNode("blockquote",block))
+        
     elif block_type == BlockType.unordered_list:
-        return f"<div>{5}</div>"
+        list_elements = []
+        for element in split_list(block):
+            list_elements.append(HTMLNode("li",element))
+        return HTMLNode("ul",None,list_elements)
+
     elif block_type == BlockType.ordered_list:
-        return f"<div>{6}</div>"
+        for element in split_list(block):
+            list_elements.append(HTMLNode("li",element))
+        return HTMLNode("ol",None,list_elements)
+
     else:
         raise TypeError(f"No BlockType: {block_type} define ")
     
+    return HTMLNode("div",None,children,None)
 
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
-    new_html = ""
+    html_children = []
     for block in blocks:
         block_type = block_to_block_type(block)
+        html_children.append(create_htmlnode_from_block(block,block_type))
         
-        """
-        Will mostliekly need to rework some of the markdown_to_blocks function specially the part about ordered and unordered lists!
-        """
-        
-    return 
+    return HTMLNode("div",None,html_children,None)

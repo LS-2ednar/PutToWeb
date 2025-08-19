@@ -2,7 +2,6 @@ from textnode import TextNode, TextType
 
 class HTMLNode:
     def __init__(self, TAG=None, VALUE=None, CHILDREN=None, PROPS=None):
-
         if TAG:
             if not isinstance(TAG,str):
                 raise TypeError(f"TAG of type {type(TAG)}! Required Type: String")
@@ -18,7 +17,7 @@ class HTMLNode:
                 raise TypeError(f"CHILDREN of type {type(CHILDREN)}! Required Type: LIST")
             elif not isinstance(CHILDREN[0],HTMLNode):
                 raise TypeError(f"CHILDREN List Element of type {type(CHILDREN[0])}! Required Type: HTMLNode")
-        
+
         if PROPS:
             if not isinstance(PROPS,dict):
                 raise TypeError(f"PROPS of type {type(PROPS)}! Required Type: Dict")
@@ -32,7 +31,8 @@ class HTMLNode:
         return f"TAG: {self.tag}\nVALUE: {self.value}\nChildren: {self.children}\nProps: {self.props_to_html}"
 
     def to_html(self):
-        raise NotImplementedError("NOT IMPLEMENTED YET!")
+        inner ="".join(child.to_html() for child in self.children)
+        return f'<{self.tag}>{inner}</{self.tag}>'
     
     def props_to_html(self):
         return_string = ""
@@ -74,6 +74,5 @@ class ParentNode(HTMLNode):
             raise ValueError("CHILDREN are required")
 
         inner ="".join(child.to_html() for child in self.children)
-
         return f'<{self.tag}>{inner}</{self.tag}>'
 
