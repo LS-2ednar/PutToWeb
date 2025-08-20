@@ -36,7 +36,7 @@ def text_node_to_html_node(text_node):
     raise Exception("Undefined Tag used")
 
 def text_to_textnodes(text):
-    node = TextNode(text,TextType.TEXT)
+    node = TextNode(text.replace("\n",""),TextType.TEXT)
     code = split_nodes_delimiter([node],"`",TextType.CODE)
     code_bold = split_nodes_delimiter(code,"**",TextType.BOLD)
     code_bold_itlaic= split_nodes_delimiter(code_bold,"_",TextType.ITALIC)
@@ -148,9 +148,11 @@ def split_list(text):
 def create_htmlnode_from_block(block,block_type):
     children = []
     if block_type == BlockType.paragraph:
+        elements = []
         textelements = text_to_textnodes(block)
         for textelement in textelements:
-            children.append(text_node_to_html_node(textelement))
+            elements.append(text_node_to_html_node(textelement))
+        children.append(HTMLNode("p", None ,elements))
 
     elif block_type == BlockType.heading:
         children.append(HTMLNode(f'h{block.count("#")}',block))
@@ -175,7 +177,7 @@ def create_htmlnode_from_block(block,block_type):
     else:
         raise TypeError(f"No BlockType: {block_type} define ")
     
-    return HTMLNode("div",None,children,None)
+    return HTMLNode(None,None,children,None)
 
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)

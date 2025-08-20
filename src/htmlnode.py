@@ -32,7 +32,7 @@ class HTMLNode:
 
     def to_html(self):
         inner ="".join(child.to_html() for child in self.children)
-        return f'<{self.tag}>{inner}</{self.tag}>'
+        return f'<{self.tag}>{inner}</{self.tag}>'.replace("<None>","").replace("</None>","")
     
     def props_to_html(self):
         return_string = ""
