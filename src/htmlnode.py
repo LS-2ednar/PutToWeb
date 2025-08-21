@@ -31,8 +31,11 @@ class HTMLNode:
         return f"TAG: {self.tag}\nVALUE: {self.value}\nChildren: {self.children}\nProps: {self.props_to_html}"
 
     def to_html(self):
-        inner ="".join(child.to_html() for child in self.children)
-        return f'<{self.tag}>{inner}</{self.tag}>'.replace("<None>","").replace("</None>","")
+        try:
+            inner ="".join(child.to_html() for child in self.children)
+            return f'<{self.tag}>{inner}</{self.tag}>'
+        except:
+            return  f'<{self.tag}>{self.value}</{self.tag}>'
     
     def props_to_html(self):
         return_string = ""

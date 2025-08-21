@@ -4,7 +4,7 @@ from textnode import *
 from enum import Enum
 
 class BlockType(Enum):
-    paragraph = "paragrah"
+    paragraph = "paragraph"
     heading = "heading"
     code = "code"
     quote = "quote"
@@ -114,29 +114,25 @@ def extract_markdown_links(text):
     return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)",text)
 
 def markdown_to_blocks(markdown):
-    raw_blocks = markdown.split("\n\n")
-    blocks = []
-    for block in raw_blocks:
-        if len(block) == 0:
-            continue
-        blocks.append(block.strip())
+    raw_blocks = re.split(r"\n\s*\n", markdown.strip())
+    blocks = [block.strip() for block in raw_blocks if block.strip()]
     return blocks
 
 def block_to_block_type(block):
-    if len(block) == 0:
-        return
-    if block[0:3] == "```" and block[-3::] == "```":
-        return BlockType.code
-    elif block[0] == ">":
-        return BlockType.quote
-    elif block[0] == "-":
-        return BlockType.unordered_list
-    elif block[1] == "." and block[0].isdigit():
-        return BlockType.ordered_list
-    elif "#" in block[0:7]:
-        return BlockType.heading
-    else:
+    if not block or block.strip() == "":
         return BlockType.paragraph
+    if block.startswith("```") and block.endswith("```"):
+        return BlockType.code
+    if block.lstrip().startswith(">"):
+        return BlockType.quote
+    lines = block.splitlines()
+    if all(line.lstrip().startswith(("-", "*")) for line in lines if line.strip() != ""):
+        return BlockType.unordered_list
+    if all(re.match(r"^\d+\.", line.lstrip()) for line in lines if line.strip() != ""):
+        return BlockType.ordered_list
+    if re.match(r"^#{1,6}\s", block):
+        return BlockType.heading
+    return BlockType.paragraph
 
 def split_list(text):
     if len(text.split("-")) > 1:
@@ -145,39 +141,81 @@ def split_list(text):
         return text.split("\n")
 
 
-def create_htmlnode_from_block(block,block_type):
-    children = []
+def create_htmlnode_from_block(block: str, block_type: BlockType) -> HTMLNode:
     if block_type == BlockType.paragraph:
-        elements = []
-        textelements = text_to_textnodes(block)
-        for textelement in textelements:
-            elements.append(text_node_to_html_node(textelement))
-        children.append(HTMLNode("p", None ,elements))
+        normalized = " ".join(block.splitlines()).strip()
+        inlines = [text_node_to_html_node(n) for n in text_to_textnodes(normalized)]
+        return HTMLNode("p", None, inlines)
 
     elif block_type == BlockType.heading:
-        children.append(HTMLNode(f'h{block.count("#")}',block))
+        # Match leading 1–6 hashes, then a space, then the title
+        m = re.match(r"^(#{1,6})\s+(.*)$", block.strip())
+        if not m:
+            # Fallback: treat as paragraph if malformed heading
+            inlines = [text_node_to_html_node(n) for n in text_to_textnodes(block)]
+            return HTMLNode("p", None, inlines)
+        level = min(len(m.group(1)), 6)
+        title = m.group(2).strip()
+        return HTMLNode(f"h{level}", title)
 
     elif block_type == BlockType.code:
-        children.append(HTMLNode("code",block))
-        
+        # Strip triple backticks and optional language id on the first line
+        raw = block.strip()
+        if raw.startswith("```"):
+            raw = raw[3:]
+            # Optional language token until first newline
+            if "\n" in raw:
+                first_nl = raw.find("\n")
+                # ignore language token raw[:first_nl]
+                raw = raw[first_nl + 1 :]
+        if raw.endswith("```"):
+            raw = raw[:-3]
+        # Do not parse inline formatting inside code blocks
+        return HTMLNode("pre", None, [HTMLNode("code", raw)])
+
     elif block_type == BlockType.quote:
-        children.append(LeafNode("blockquote",block))
-        
+        stripped_lines = []
+        for line in block.splitlines():
+            line = line.lstrip()
+            if line.startswith(">"):
+                line = line[1:]
+                if line.startswith(" "):
+                    line = line[1:]
+            stripped_lines.append(line)
+        quote_text = " ".join(stripped_lines).strip()
+        inlines = [text_node_to_html_node(n) for n in text_to_textnodes(quote_text)]
+        return HTMLNode("blockquote", None, inlines)
+
     elif block_type == BlockType.unordered_list:
-        list_elements = []
-        for element in split_list(block):
-            list_elements.append(HTMLNode("li",element))
-        return HTMLNode("ul",None,list_elements)
+        items = []
+        for line in block.splitlines():
+            line = line.rstrip()
+            if not line.strip():
+                continue
+            m = re.match(r"^\s*[-*]\s+(.*)$", line)
+            if not m:
+                continue
+            item_text = m.group(1).strip()
+            inlines = [text_node_to_html_node(n) for n in text_to_textnodes(item_text)]
+            items.append(HTMLNode("li", None, inlines))
+        return HTMLNode("ul", None, items)
 
     elif block_type == BlockType.ordered_list:
-        for element in split_list(block):
-            list_elements.append(HTMLNode("li",element))
-        return HTMLNode("ol",None,list_elements)
+        items = []
+        for line in block.splitlines():
+            line = line.rstrip()
+            if not line.strip():
+                continue
+            m = re.match(r"^\s*\d+\.\s+(.*)$", line)
+            if not m:
+                continue
+            item_text = m.group(1).strip()
+            inlines = [text_node_to_html_node(n) for n in text_to_textnodes(item_text)]
+            items.append(HTMLNode("li", None, inlines))
+        return HTMLNode("ol", None, items)
 
     else:
-        raise TypeError(f"No BlockType: {block_type} define ")
-    
-    return HTMLNode(None,None,children,None)
+        raise TypeError(f"Unsupported BlockType: {block_type}")
 
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
