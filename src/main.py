@@ -1,9 +1,7 @@
-from textnode import TextNode
-#./main.sh
-#hello world
+from copy_to_target_directory import copy_to_target_directory
 
 def main():
-    node = TextNode("I love my Mouse","bold","www.google.com")
-    print(node)
+    copy_to_target_directory()
+
 if __name__ == "__main__":
     main()
