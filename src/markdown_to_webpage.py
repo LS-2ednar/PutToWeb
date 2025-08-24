@@ -46,6 +46,7 @@ def generate_pages_recursively(dir_path_content, template_path, dest_dir_path, b
             print(f"{dir_path_content}/{content}")
             generate_page(content_path,template_path,dest_path, basepath)
         else:
+            new_basepath = os.path.join(basepath,content)
             if not os.path.isfile(content_path) and not os.path.exists(dest_path):
                 os.mkdir(dest_path)
-                generate_pages_recursively(content_path, template_path, dest_path, basepath)
+                generate_pages_recursively(content_path, template_path, dest_path, new_basepath)
