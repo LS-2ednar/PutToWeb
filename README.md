@@ -5,13 +5,16 @@ Markdown is an awesome way to format text in a texteditor and can be interpreted
 Another cool thing about this project is that there are 76 unittests which hopefully did catch all edgecases for my codebase.
 
 ## How to use this codebase
-1. '''gitclone https://github.com/LS-2ednar/PutToWeb'''
+1. `gitclone https://github.com/LS-2ednar/PutToWeb`
 2. Write your content and store it in your content directory
-3. Using '''./main.sh''' you can create a locally hosted version of your static site when checking out '''https://localhost:8888/'''
-4. When you are ready to push your website to the web, '''./build.sh'''
-5. On Github in your repo go to '''Settings''' -> '''Pages''' -> at the source select '''main''' and '''docs''' as this is where src/main.py will save the html for your webpage. 
+3. Using `./main.sh` you can create a locally hosted version of your static site when checking out `https://localhost:8888/`
+4. When you are ready to push your website to the web, `./build.sh`
+5. On Github in your repo go to `Settings` -> `Pages` -> at the source select `main` and `docs` as this is where src/main.py will save the html for your webpage. 
 
 ## Used libraries
 - os
 - sys
 - Unittest for Unittests
+
+## Future improvements
+- Add documentation on how to host pages on another domain
