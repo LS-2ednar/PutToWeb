@@ -19,4 +19,5 @@ Another cool thing about this project is that there are 76 unittests which hopef
 ## Future improvements
 - Add documentation on how to host pages on another domain
 - Do some amazing shit with this repo and share it with friends
+- In case this is not mentioned jet... I like otters... because they are otterly amazing
 
