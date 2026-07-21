@@ -53,6 +53,7 @@ Though Legolas's deeds are celebrated, Glorfindel's influence is woven directly 
 
 - **A Historical Touchstone**: His legacy casts long shadows over pivotal events, reinforcing the enduring themes of sacrifice and rebirth that resonate throughout the legendarium.
 - **A Luminary of Legend**: Respected and revered in songs, his tale remains an inspiration, an immortal testament to courage—a rarity that transcends time.
+-_**Magic**: Power of Wizards and Sourceres._
 
 ## Conclusion
 
